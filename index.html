@@ -211,7 +211,7 @@ h1{
     <input id="secret" type="password" placeholder="Solo tú sabes la clave 💌">
     <div class="hint">Pista: no es una palabra, es un recuerdo</div>
 
-    <button id="btn" onclick="checkAccess()">Abrir carta</button>
+    <button id="btn" onclick="checkAccess(); playMusic()">Abrir carta</button>
     <p id="error">Esa no es la clave 💔</p>
     <div class="waiting" id="waitMsg">No hay prisa… tómate tu tiempo 🤍</div>
   </div>
@@ -259,21 +259,22 @@ const heartMessages=[
 
 let heartArea=null;
 
+function playMusic(){
+    const audio=document.getElementById("music");
+    audio.volume=0.7;
+    audio.play().catch(()=>{});
+}
+
 function checkAccess(){
     const val=document.getElementById("secret").value.trim();
     const error=document.getElementById("error");
     if(val===UNIQUE_KEY){
-        start();
+        document.getElementById("intro").remove();
+        document.getElementById("finalText").style.opacity=1;
+        initFlowerHeart();
     }else{
         error.style.display="block";
     }
-}
-
-function start(){
-    document.getElementById("intro").remove();
-    document.getElementById("finalText").style.opacity=1;
-    document.getElementById("music").play(); // 🎶 AQUÍ SUENA
-    initFlowerHeart();
 }
 
 function spawnLove(e){
