@@ -6,108 +6,239 @@
 <title>Para mi Gigi ❤️</title>
 
 <style>
-body {
-    margin: 0;
-    background: black;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    overflow:hidden;
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:radial-gradient(circle at center,#200010,#000 70%);
+    color:white;
 }
-canvas {
-    position: absolute;
-    width: 100%;
-    height: 100%;
+
+.bg-glow{
+    position:fixed;
+    inset:0;
+    background:radial-gradient(circle at center,rgba(255,40,120,.15),transparent 65%);
+    z-index:0;
 }
-#btn {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    padding: 18px 40px;
-    font-size: 1.2rem;
-    border-radius: 50px;
-    border: none;
-    background: #ff0055;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 0 25px #ff0055;
+
+canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
 }
-#text {
-    position: absolute;
-    bottom: 12%;
-    width: 100%;
-    text-align: center;
-    color: white;
-    display: none;
+
+/* INTRO */
+#intro{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    z-index:50;
+    background:linear-gradient(135deg,#fff1f6,#ffe8cc,#fff1e6);
 }
-h1 {
-    color: #ff0055;
-    text-shadow: 0 0 15px #ff0055;
+
+.intro-card{
+    background:rgba(255,255,255,.95);
+    border-radius:22px;
+    padding:clamp(25px,5vw,40px);
+    text-align:center;
+    width:100%;
+    max-width:420px;
+    box-shadow:0 25px 60px rgba(0,0,0,.2);
 }
-#player {
-    display: none;
+
+#typeText{
+    font-size:clamp(1rem,4vw,1.2rem);
+    color:#7a3b50;
+    line-height:1.6;
+    min-height:110px;
+    margin-bottom:20px;
+}
+
+.envelope{
+    width:clamp(180px,60vw,240px);
+    height:clamp(120px,40vw,150px);
+    margin:0 auto 25px;
+    background:linear-gradient(#fff,#ffe4ec);
+    border-radius:14px;
+    position:relative;
+}
+
+.seal{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    width:44px;
+    height:44px;
+    background:#ff7aa2;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    color:white;
+    animation:pulse 1.8s infinite;
+}
+
+#secret{
+    padding:12px;
+    border-radius:20px;
+    border:1px solid #ccc;
+    width:100%;
+    margin-bottom:8px;
+    text-align:center;
+    font-size:1rem;
+}
+
+.hint{
+    font-size:.85rem;
+    color:#9c5b70;
+    margin-bottom:15px;
+}
+
+#btn{
+    padding:14px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(135deg,#ff9fbf,#ff7aa2);
+    color:white;
+    font-size:1rem;
+    cursor:pointer;
+    width:100%;
+}
+
+#error{
+    color:#ff4d6d;
+    display:none;
+    margin-top:10px;
+    font-size:.95rem;
+}
+
+@keyframes pulse{
+    50%{transform:translate(-50%,-50%) scale(1.15)}
+}
+
+/* FINAL */
+.interface{
+    position:absolute;
+    bottom:8%;
+    width:100%;
+    text-align:center;
+    z-index:10;
+    opacity:0;
+    transition:opacity 2s;
+}
+
+h1{
+    font-size:clamp(2rem,6vw,3rem);
+    color:#ff2b7a;
+    text-shadow:0 0 20px #ff0055;
+}
+
+.dedication{
+    font-size:clamp(1rem,4vw,1.3rem);
+    margin-top:12px;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="c"></canvas>
+<div class="bg-glow"></div>
+<canvas id="scene"></canvas>
 
-<div id="player"></div>
+<!-- INTRO -->
+<div id="intro">
+  <div class="intro-card">
+    <div id="typeText"></div>
 
-<button id="btn">PRESIONA AQUÍ, GIGI ❤️</button>
+    <div class="envelope">
+        <div class="seal">❤️</div>
+    </div>
 
-<div id="text">
+    <input id="secret" type="password" placeholder="Solo tú sabes la clave 💌">
+    <div class="hint">Pista: no es una palabra, es un recuerdo</div>
+
+    <button id="btn" onclick="checkAccess()">Abrir carta</button>
+    <p id="error">Esa no es la clave 💔</p>
+  </div>
+</div>
+
+<div class="interface" id="finalText">
     <h1>¡Feliz Cumpleaños, Mi Gigi!</h1>
-    <div>Te quiero con todo mi corazón ❤️</div>
-    <div>Eres lo más importante para mí</div>
+    <div class="dedication">Te quiero con todo mi corazón ❤️</div>
 </div>
 
 <script>
-let tag = document.createElement("script");
-tag.src = "https://www.youtube.com/iframe_api";
-document.body.appendChild(tag);
+const UNIQUE_KEY="UNO";
+const text="Gigi,\nesto es para ti.\n\nHay sentimientos que no se fuerzan,\nsimplemente aparecen ✨";
+let i=0;
+const el=document.getElementById("typeText");
 
-let player;
-let ready = false;
+function typeWriter(){
+    if(i<text.length){
+        el.innerHTML+=text[i]==="\n"?"<br>":text[i];
+        i++;
+        setTimeout(typeWriter,40);
+    }
+}
+typeWriter();
 
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player("player", {
-        videoId: "VYtJAuoZxcc",
-        playerVars: {
-            start: 60,
-            controls: 0
-        },
-        events: {
-            onReady: () => ready = true
-        }
-    });
+function checkAccess(){
+    if(document.getElementById("secret").value.trim()===UNIQUE_KEY){
+        document.getElementById("intro").remove();
+        document.getElementById("finalText").style.opacity=1;
+        initFlowerHeart();
+    }else{
+        document.getElementById("error").style.display="block";
+    }
 }
 
-document.getElementById("btn").onclick = () => {
-    document.getElementById("btn").style.display = "none";
-    document.getElementById("text").style.display = "block";
+function initFlowerHeart(){
+    const canvas=document.getElementById("scene");
+    const ctx=canvas.getContext("2d");
 
-    if (ready) {
-        player.seekTo(60);
-        player.playVideo();
+    function resize(){
+        canvas.width=innerWidth;
+        canvas.height=innerHeight;
     }
+    resize();
+    window.addEventListener("resize",resize);
 
-    startHearts();
-};
+    canvas.addEventListener("click",()=>{
+        window.open("https://www.youtube.com/watch?v=VYtJAuoZxcc","_blank");
+    });
 
-function startHearts() {
-    const canvas = document.getElementById("c");
-    const ctx = canvas.getContext("2d");
-    canvas.width = innerWidth;
-    canvas.height = innerHeight;
-
-    function draw() {
+    function draw(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.font = "30px Arial";
-        ctx.fillStyle = "#ff0055";
-        ctx.fillText("❤️", Math.random()*canvas.width, Math.random()*canvas.height);
+        const cx=canvas.width/2;
+        const cy=canvas.height/2-60;
+
+        ctx.strokeStyle="#1f8f4a";
+        ctx.lineWidth=10;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy+140);
+        ctx.lineTo(cx,canvas.height);
+        ctx.stroke();
+
+        ctx.fillStyle="#ff0055";
+        ctx.beginPath();
+        for(let t=0;t<Math.PI*2;t+=0.01){
+            const x=cx+180*Math.sin(t)**3;
+            const y=cy-(140*Math.cos(t)-55*Math.cos(2*t)-20*Math.cos(3*t));
+            ctx.lineTo(x,y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
         requestAnimationFrame(draw);
     }
     draw();
