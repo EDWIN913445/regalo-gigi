@@ -191,15 +191,6 @@ h1{
 @keyframes fadeMsg{
     20%,80%{opacity:1}
 }
-
-/* MÚSICA OCULTA */
-#music{
-    position:fixed;
-    width:0;
-    height:0;
-    border:0;
-    opacity:0;
-}
 </style>
 </head>
 
@@ -233,15 +224,12 @@ h1{
     <div class="dedication">Eres lo más importante para mí</div>
 </div>
 
-<!-- MÚSICA -->
-<iframe
-id="music"
-src=""
-allow="autoplay">
-</iframe>
+<!-- MÚSICA LOCAL -->
+<audio id="music" loop>
+    <source src="coro.mp3" type="audio/mpeg">
+</audio>
 
 <script>
-/* TEXTO QUE SE ESCRIBE SOLO */
 const text="Gigi,\nesto es para ti.\n\nHay sentimientos que no se fuerzan,\nsimplemente aparecen ✨";
 let i=0;
 const speed=40;
@@ -256,15 +244,12 @@ function typeWriter(){
 }
 typeWriter();
 
-/* MENSAJE SI ESPERA */
 setTimeout(()=>{
     document.getElementById("waitMsg").style.opacity=1;
 },6000);
 
-/* CLAVE */
 const UNIQUE_KEY="UNO";
 
-/* EFECTOS */
 const emojis=["❤️","💖","🌹","✨","🌸"];
 const heartMessages=[
  "Gigi, me importa mucho lo que sientes 🤍",
@@ -285,19 +270,10 @@ function checkAccess(){
 }
 
 function start(){
-    const intro=document.getElementById("intro");
-    intro.style.opacity="0";
-    intro.style.pointerEvents="none";
-
-    /* ACTIVAR MÚSICA */
-    const music=document.getElementById("music");
-    music.src="https://www.youtube.com/embed/VYtJAuoZxcc?autoplay=1&loop=1&playlist=VYtJAuoZxcc";
-
-    setTimeout(()=>{
-        intro.remove();
-        document.getElementById("finalText").style.opacity=1;
-        initFlowerHeart();
-    },1200);
+    document.getElementById("intro").remove();
+    document.getElementById("finalText").style.opacity=1;
+    document.getElementById("music").play(); // 🎶 AQUÍ SUENA
+    initFlowerHeart();
 }
 
 function spawnLove(e){
@@ -325,7 +301,6 @@ function showHeartMessage(){
     setTimeout(()=>m.remove(),4000);
 }
 
-/* CORAZÓN */
 function initFlowerHeart(){
     const canvas=document.getElementById("scene");
     const ctx=canvas.getContext("2d");
@@ -339,10 +314,8 @@ function initFlowerHeart(){
 
     function draw(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
-
         const cx=canvas.width/2;
         const cy=canvas.height/2-60;
-
         heartArea={x:cx,y:cy,w:180,h:160};
 
         ctx.strokeStyle="#1f8f4a";
@@ -351,11 +324,6 @@ function initFlowerHeart(){
         ctx.moveTo(cx,cy+140);
         ctx.lineTo(cx,canvas.height);
         ctx.stroke();
-
-        ctx.fillStyle="#2ecc71";
-        ctx.beginPath();
-        ctx.ellipse(cx-40,cy+220,50,25,-0.6,0,Math.PI*2);
-        ctx.fill();
 
         ctx.fillStyle="#ff0055";
         ctx.beginPath();
